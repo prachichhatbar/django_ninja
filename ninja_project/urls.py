@@ -16,6 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.shortcuts import redirect
 from ninja import NinjaAPI
 from ninja_tasks.api import router as ninja_tasks_router
 
@@ -25,4 +26,5 @@ api.add_router("", ninja_tasks_router)
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', api.urls),
+    path('', lambda request: redirect('api/docs', permanent=False)),  # Redirect root to API docs
 ]

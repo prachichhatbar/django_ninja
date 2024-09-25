@@ -16,12 +16,11 @@ class TaskIn(Schema):
 
 @router.get("/tasks", response=List[TaskSchema])
 def list_tasks(request):
-    return NinjaTask.objects.all()
+    return list(NinjaTask.objects.all())
 
 @router.post("/tasks", response=TaskSchema)
 def create_task(request, task: TaskIn):
-    task = NinjaTask.objects.create(**task.dict())
-    return task
+    return NinjaTask.objects.create(**task.dict())
 
 @router.get("/tasks/{task_id}", response=TaskSchema)
 def get_task(request, task_id: int):
