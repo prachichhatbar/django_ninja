@@ -5,7 +5,7 @@ db.sqlite3
 *.pyo
 *.pyd
 .Python
-env
+.env
 venv
 pip-log.txt
 pip-delete-this-directory.txt
@@ -21,3 +21,4 @@ coverage.xml
 .mypy_cache
 .pytest_cache
 .hypothesis
+static_root/

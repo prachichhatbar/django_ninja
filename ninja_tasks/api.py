@@ -1,48 +1,42 @@
-from ninja import NinjaAPI, Schema
-from ninja.orm import create_schema
+from ninja import Router, Schema
 from typing import List
 from .models import NinjaTask
 
-api = NinjaAPI()
+router = Router()
 
-# Create schemas
-NinjaTaskSchema = create_schema(NinjaTask)
-
-class NinjaTaskIn(Schema):
+class TaskSchema(Schema):
+    id: int
     title: str
     description: str = None
-    priority: str = 'M'
+    completed: bool
 
-@api.get("/tasks", response=List[NinjaTaskSchema])
+class TaskIn(Schema):
+    title: str
+    description: str = None
+
+@router.get("/tasks", response=List[TaskSchema])
 def list_tasks(request):
     return NinjaTask.objects.all()
 
-@api.post("/tasks", response=NinjaTaskSchema)
-def create_task(request, task: NinjaTaskIn):
-    task_dict = task.dict()
-    return NinjaTask.objects.create(**task_dict)
+@router.post("/tasks", response=TaskSchema)
+def create_task(request, task: TaskIn):
+    task = NinjaTask.objects.create(**task.dict())
+    return task
 
-@api.get("/tasks/{task_id}", response=NinjaTaskSchema)
+@router.get("/tasks/{task_id}", response=TaskSchema)
 def get_task(request, task_id: int):
     return NinjaTask.objects.get(id=task_id)
 
-@api.put("/tasks/{task_id}", response=NinjaTaskSchema)
-def update_task(request, task_id: int, data: NinjaTaskIn):
+@router.put("/tasks/{task_id}", response=TaskSchema)
+def update_task(request, task_id: int, data: TaskIn):
     task = NinjaTask.objects.get(id=task_id)
     for attr, value in data.dict().items():
         setattr(task, attr, value)
     task.save()
     return task
 
-@api.delete("/tasks/{task_id}")
+@router.delete("/tasks/{task_id}")
 def delete_task(request, task_id: int):
     task = NinjaTask.objects.get(id=task_id)
     task.delete()
-    return {"success": True}
-
-@api.put("/tasks/{task_id}/complete")
-def complete_task(request, task_id: int):
-    task = NinjaTask.objects.get(id=task_id)
-    task.completed = True
-    task.save()
     return {"success": True}
