@@ -1,4 +1,4 @@
-# Django Ninja Docker Project with Uvicorn
+# Django Ninja Docker Project
 
 ## Project Overview
 
@@ -9,14 +9,6 @@ This project demonstrates a modern Django application setup, incorporating:
 - Uvicorn as an ASGI server
 
 The application is a simple task management API, showcasing CRUD operations and API documentation.
-
-## Technologies Used
-
-- **Django**: A high-level Python web framework
-- **Django Ninja**: A fast Django REST framework
-- **Docker**: A platform for developing, shipping, and running applications
-- **Uvicorn**: A lightning-fast ASGI server
-- **Python**: The programming language used (version 3.11)
 
 ## Project Structure
 
@@ -37,9 +29,13 @@ django_ninja/
 │   ├── models.py
 │   ├── tests.py
 │   └── views.py
+├── static/
 ├── .dockerignore
 ├── .gitignore
+├── .env
+├── .env.example
 ├── Dockerfile
+├── docker-compose.yml
 ├── manage.py
 └── requirements.txt
 ```
@@ -52,21 +48,54 @@ django_ninja/
    cd django-ninja-docker
    ```
 
-2. Build the Docker image:
+2. Create a `.env` file in the project root and add the following content:
    ```
-   docker build -t django-ninja-app .
+   DJANGO_SECRET_KEY=your_secret_key_here
+   DJANGO_DEBUG=True
+   DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0
    ```
+   Replace `your_secret_key_here` with a secure secret key.
 
-3. Run the Docker container:
+3. Build and start the Docker containers:
    ```
-   docker run -p 8000:8000 \
-     -e SECRET_KEY="your-secret-key" \
-     -e DEBUG=True \
-     -e ALLOWED_HOSTS="localhost,127.0.0.1,0.0.0.0" \
-     django-ninja-app
+   docker-compose up --build
    ```
 
 4. Access the API documentation at `http://localhost:8000/api/docs`
+
+## Docker Usage
+
+The project uses Docker and Docker Compose for easy setup and deployment.
+
+- To start the project:
+  ```
+  docker-compose up
+  ```
+
+- To rebuild the Docker image after making changes:
+  ```
+  docker-compose up --build
+  ```
+
+- To stop the project:
+  ```
+  docker-compose down
+  ```
+
+- To view logs:
+  ```
+  docker-compose logs
+  ```
+
+## Development Workflow
+
+1. Make changes to your Django code.
+2. If you've made changes to the Python dependencies, update `requirements.txt`.
+3. Rebuild and restart the Docker containers:
+   ```
+   docker-compose up --build
+   ```
+4. Access your application at `http://localhost:8000/api/docs` to see the changes.
 
 ## Key Components
 
@@ -76,7 +105,6 @@ The main Django project configuration.
 
 - `settings.py`: Contains project settings, including database configuration, installed apps, and middleware.
 - `urls.py`: Defines the URL routing for the project.
-- `asgi.py`: ASGI configuration for running the project with Uvicorn.
 
 ### Django App (ninja_tasks)
 
@@ -87,35 +115,21 @@ The main application containing the API logic.
 
 ### Dockerfile
 
-```dockerfile
-FROM python:3.11-slim
+The Dockerfile sets up the Python environment, installs dependencies, and configures the Django application for running with Uvicorn.
 
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+### docker-compose.yml
 
-WORKDIR /app
+Defines the services, networks, and volumes for the Docker setup. It specifies how to build and run the Django application container.
 
-COPY requirements.txt .
-RUN pip install --upgrade pip && pip install -r requirements.txt
+## Environment Variables
 
-COPY . .
+The project uses the following environment variables:
 
-RUN python manage.py migrate
-RUN python manage.py collectstatic --noinput
+- `DJANGO_SECRET_KEY`: The secret key for Django.
+- `DJANGO_DEBUG`: Set to `True` for development, `False` for production.
+- `DJANGO_ALLOWED_HOSTS`: Comma-separated list of allowed hosts.
 
-EXPOSE 8000
-
-CMD ["python", "-m", "uvicorn", "ninja_project.asgi:application", "--host", "0.0.0.0", "--port", "8000"]
-```
-
-This Dockerfile:
-1. Uses Python 3.11
-2. Sets up the working directory
-3. Installs dependencies
-4. Copies the project files
-5. Runs migrations and collects static files
-6. Exposes port 8000
-7. Starts the application using Uvicorn
+These are defined in the `.env` file and passed to the Docker container.
 
 ## API Endpoints
 
@@ -125,33 +139,12 @@ This Dockerfile:
 - `PUT /api/tasks/{task_id}`: Update a specific task
 - `DELETE /api/tasks/{task_id}`: Delete a specific task
 
-## Why This Stack?
-
-1. **Django**: Provides a robust foundation for web applications with its "batteries-included" philosophy.
-2. **Django Ninja**: Offers a fast, modern way to build APIs with automatic OpenAPI (Swagger) documentation.
-3. **Docker**: Ensures consistency across development, testing, and production environments.
-4. **Uvicorn**: Provides a high-performance ASGI server, capable of handling asynchronous Python code efficiently.
-
-## Benefits of Using Uvicorn
-
-- **High Performance**: One of the fastest Python ASGI servers available.
-- **Asynchronous Support**: Built to handle asynchronous Python code efficiently.
-- **Simplicity**: Easy to integrate with Django and other ASGI frameworks.
-- **Production-Ready**: Suitable for use in production environments with proper configuration.
-
-## Development Workflow
-
-1. Make changes to the Django application code.
-2. Rebuild the Docker image: `docker build -t django-ninja-app .`
-3. Run the new container to test changes.
-4. Commit and push changes to GitHub.
-
 ## Testing
 
-To run tests, use the following command in the Docker container:
+To run tests:
 
 ```
-python manage.py test
+docker-compose run web python manage.py test
 ```
 
 ## Deployment
@@ -165,14 +158,3 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## License
 
 This project is licensed under the MIT License.
-
-## Acknowledgements
-
-- Django documentation
-- Django Ninja documentation
-- Docker documentation
-- Uvicorn documentation
-
----
-
-This project serves as a template for building modern, containerized Django applications with API capabilities. It demonstrates best practices in Django development, API design with Django Ninja, and deployment using Docker and Uvicorn.
