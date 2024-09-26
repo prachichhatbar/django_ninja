@@ -26,5 +26,5 @@ api.add_router("", ninja_tasks_router)
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', api.urls),
-    path('', lambda request: redirect('api/docs', permanent=False)),  # Redirect root to API docs
+    path('', lambda request: redirect('api/docs', permanent=False)),  
 ]
