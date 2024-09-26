@@ -150,11 +150,3 @@ docker-compose run web python manage.py test
 ## Deployment
 
 This project is set up to be easily deployable to any Docker-compatible hosting service. Ensure that you set the appropriate environment variables for production use.
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-This project is licensed under the MIT License.
